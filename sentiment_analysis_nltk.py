@@ -66,8 +66,8 @@ all_features = list()
 texts = list()
 data_labels = list()
 
-positive_file = 'machine_learning/the_real_life_of_saudi_woman/positive.txt'
-negative_file = 'machine_learning/the_real_life_of_saudi_woman/negative.txt'
+positive_file = 'machine_learning/talak_c/positive.txt'
+negative_file = 'machine_learning/talak_c/negative.txt'
 
 n_grams_flag = False
 min_freq = 13
@@ -80,7 +80,7 @@ with open(positive_file, encoding='utf-8') as tweets_file:
         all_features += text_features
         texts.append(text_features)
         data_labels.append('pos')
-data = data[:2500]
+texts = texts[:2500]
 data_labels = data_labels[:2500]
  
 # read negative data
@@ -91,7 +91,7 @@ with open(negative_file, encoding='utf-8') as tweets_file:
         texts.append(text_features)
         data_labels.append('neg')
 
-data = data[:5000]
+texts = texts[:5000]
 data_labels = data_labels[:5000]
 
 
