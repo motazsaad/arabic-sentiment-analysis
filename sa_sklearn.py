@@ -20,11 +20,18 @@ with open(positive_file, encoding='utf-8') as f:
         data.append(i)
         data_labels.append('pos')
 
+data = data[:2500]
+data_labels = data_labels[:2500]
+
 # read negative data
 with open(negative_file, encoding='utf-8') as f:
     for i in f:
         data.append(i)
         data_labels.append('neg')
+
+data = data[:5000]
+data_labels = data_labels[:5000]
+
 
 print('data size', len(data_labels))
 print('# of positive', data_labels.count('pos'))

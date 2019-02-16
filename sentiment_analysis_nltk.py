@@ -45,8 +45,8 @@ def document_features(document, corpus_features):
 data = []
 data_labels = []
 
-positive_file = 'arabic_tweets_txt/positive_tweets_arabic_20181207_300.txt'
-negative_file = 'arabic_tweets_txt/negative_tweets_arabic_20181207_300.txt'
+positive_file = 'machine_learning/the_real_life_of_saudi_woman/positive.txt'
+negative_file = 'machine_learning/the_real_life_of_saudi_woman/negative.txt'
 
 print('read data ...')
 # read positive data
@@ -54,12 +54,18 @@ with open(positive_file, encoding='utf-8') as f:
     for i in f:
         data.append(i)
         data_labels.append('pos')
-
+data = data[:2500]
+data_labels = data_labels[:2500]
+ 
 # read negative data
 with open(negative_file, encoding='utf-8') as f:
     for i in f:
         data.append(i)
         data_labels.append('neg')
+
+data = data[:5000]
+data_labels = data_labels[:5000]
+
 
 print('data size', len(data_labels))
 print('# of positive', data_labels.count('pos'))
