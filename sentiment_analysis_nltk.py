@@ -94,7 +94,6 @@ with open(negative_file, encoding='utf-8') as tweets_file:
 texts = texts[:5000]
 data_labels = data_labels[:5000]
 
-
 print('data size', len(data_labels))
 print('# of positive', data_labels.count('pos'))
 print('# of negative', data_labels.count('neg'))
