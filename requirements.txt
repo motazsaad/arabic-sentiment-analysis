@@ -1,2 +1,4 @@
+tweet-preprocessor
+numpy
 nltk
 sklearn

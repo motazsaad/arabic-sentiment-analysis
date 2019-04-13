@@ -1,89 +1,98 @@
-from sklearn import metrics
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.naive_bayes import GaussianNB, MultinomialNB
 import random
-from sklearn.metrics import accuracy_score
+import sys
+
+import numpy as np
+from sklearn import metrics
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import SGDClassifier
+from sklearn.naive_bayes import MultinomialNB, BernoulliNB
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.pipeline import Pipeline
+from sklearn.svm import LinearSVC
+from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
+
+from textutil import *
 
 
-data = []
-data_labels = []
+def load():
+    pos_train_file = 'arabic_tweets_tsv/train_pos_20181206_1k.tsv'
+    neg_train_file = 'arabic_tweets_tsv/train_neg_20181206_1k.tsv'
 
-positive_file = 'arabic_tweets_txt/positive_tweets_arabic_20181207_100.txt'
-negative_file = 'arabic_tweets_txt/negative_tweets_arabic_20181207_100.txt'
+    pos_test_file = 'arabic_tweets_tsv/test_pos_20181206_1k.tsv'
+    neg_test_file = 'arabic_tweets_tsv/test_neg_20181206_1k.tsv'
 
-print('read data ...')
-# read positive data
-with open(positive_file, encoding='utf-8') as f:
-    for i in f:
-        data.append(i)
-        data_labels.append('pos')
+    pos_train_data, pos_train_labels = read_tsv(pos_train_file)
+    neg_train_data, neg_train_labels = read_tsv(neg_train_file)
 
-# read negative data
-with open(negative_file, encoding='utf-8') as f:
-    for i in f:
-        data.append(i)
-        data_labels.append('neg')
+    pos_test_data, pos_test_labels = read_tsv(pos_test_file)
+    neg_test_data, neg_test_labels = read_tsv(neg_test_file)
+    print('------------------------------------')
 
-print('data size', len(data_labels))
-print('# of positive', data_labels.count('pos'))
-print('# of negative', data_labels.count('neg'))
+    sample_size = 2
+    print('{} random train tweets (positive) .... '.format(sample_size))
+    print(np.array(random.sample(pos_train_data, sample_size)))
+    print('------------------------------------')
+    print('{} random train tweets (negative) .... '.format(sample_size))
+    print(np.array(random.sample(neg_train_data, sample_size)))
+    print('------------------------------------')
 
-print('text to word-frequency vectors')
-vectorizer = CountVectorizer(
-    analyzer = 'word',
-    lowercase = False,
-    ngram_range = (1, 2),
-    min_df = 3
-)
+    x_train = pos_train_data + neg_train_data
+    y_train = pos_train_labels + neg_train_labels
 
-print('transform data to vectors')
-features = vectorizer.fit_transform(data)
-print('represent features as array')
-features_nd = features.toarray()  # for easy usage
-test_percentage = 0.2
-print('split the data into train ({}%) and test ({}%)'.format(
-    (1-test_percentage)*100, test_percentage*100))
-X_train, X_test, y_train, y_test = train_test_split(
-        features_nd,
-        data_labels,
-        test_size=test_percentage,
-        random_state=42,
-        stratify=data_labels)
-######################################################
+    x_test = pos_test_data + neg_test_data
+    y_test = pos_test_labels + neg_test_labels
 
-print('define classifier')
-# classifier = LogisticRegression()
-classifier = MultinomialNB()
-# classifier = GaussianNB()
-print('classifier:', classifier.__class__)
-
-print('train ...')
-classifier = classifier.fit(X=X_train, y=y_train)
-print('make predictions on test data')
-y_pred = classifier.predict(X_test)
+    print('train data size:{}\ttest data size:{}'.format(len(y_train), len(y_test)))
+    print('train data: # of pos:{}\t# of neg:{}\t'.format(y_train.count('pos'), y_train.count('neg')))
+    print('test data: # of pos:{}\t# of neg:{}\t'.format(y_test.count('pos'), y_test.count('neg')))
+    print('------------------------------------')
+    return x_train, y_train, x_test, y_test
 
 
-print('accuracy:')
-print(accuracy_score(y_test, y_pred))
-print('classifier:', classifier.__class__)
-print('accuracy:', accuracy_score(y_test, y_pred));
-print(metrics.classification_report(y_test, y_pred))
+def do_sa(n, my_classifier):
+    my_data = load()
+    x_train, y_train, x_test, y_test = my_data
+    print('parameters')
+    print('n grams:', n)
+    print('classifier:', my_classifier.__class__.__name__)
+    print('------------------------------------')
 
-# print('display random predictions from the test data')
-# j = random.randint(0, len(X_test)-7)
-# for i in range(j, j+7):
-#     label = y_pred[0]
-#     ind = features_nd.tolist().index(X_test[i].tolist())
-#     text = data[ind].strip()
-#     print('label:', label, 'text:', text)
+    pipeline = Pipeline([
+        ('vect', TfidfVectorizer(min_df=5, max_df=0.95,
+                                 analyzer='word', lowercase=False,
+                                 ngram_range=(1, n))),
+        ('clf', my_classifier),
+    ])
+
+    pipeline.fit(x_train, y_train)
+    feature_names = pipeline.named_steps['vect'].get_feature_names()
+    print('features:', )
+
+    y_predicted = pipeline.predict(x_test)
+
+    # Print the classification report
+    print(metrics.classification_report(y_test, y_predicted,
+                                        target_names=['pos', 'neg']))
+
+    # Print the confusion matrix
+    cm = metrics.confusion_matrix(y_test, y_predicted)
+    print(cm)
+    print('# of features:', len(feature_names))
+    print('sample of features:', random.sample(feature_names, 200))
 
 
-print('test example')
-docs_new = ['انا احب البيتزا ❤ ❤ ', 'المعنويات عالية :) 👌 ',
-            'انا بكره الروتين ']
-X_new_counts = vectorizer.transform(docs_new)
-predicted = classifier.predict(X_new_counts.toarray())
-for doc, category in zip(docs_new, predicted):
-    print('label: {}\tdoc: {}'.format(category, doc))
+if __name__ == '__main__':
+    ngrams = (1, 2, 3)
+    classifiers = [LinearSVC(), SVC(), MultinomialNB(),
+                   BernoulliNB(), SGDClassifier(), DecisionTreeClassifier(max_depth=5),
+                   RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1),
+                   KNeighborsClassifier(3)
+                   ]
+    for alg in classifiers:
+        alg_name = alg.__class__.__name__
+        for g in ngrams:
+            outfile = sys.argv[0][:-2] + '_' + alg_name + '_' + str(g) + '.result'
+            sys.stdout = open(outfile, mode='w', encoding='utf-8')
+            do_sa(g, alg)
