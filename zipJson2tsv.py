@@ -22,14 +22,19 @@ def clean(text):
 
 
 def do_work(zip_file, label):
-    outfilename = 'arabic_tweets_tsv/' + zip_file.replace('zip', '') + 'tsv'
-    outfile = open(outfilename, encoding='utf-8', mode='w')
+    outfile_name = 'arabic_tweets_tsv/' + zip_file.replace('zip', '') + 'tsv'
+    outfile = open(outfile_name, encoding='utf-8', mode='w')
+
+    all_count = 0
+    count = 0
+
     with zipfile.ZipFile('arabic_tweets_json/' + zip_file) as z:
         for filename in z.namelist():
             print('processing', filename)
             with z.open(filename) as f:
                 lines = f.readlines()
                 for line in lines:
+                    all_count += 1
                     json_tweet = json.loads(line)
                     if 'retweeted_status' in json_tweet:
                         text = json_tweet['retweeted_status']['text']
@@ -39,11 +44,14 @@ def do_work(zip_file, label):
                     if has_spam(clean_tweet):
                         continue
                     outfile.write('{}\t{}\n'.format(label, clean_tweet))
+                    count += 1
+    print('{} tweets are kept out of {}'.format(count, all_count))
+    print('----------------------')
 
 
 if __name__ == '__main__':
-    do_work('Arabic_tweets_negative_20190412.zip',
+    do_work('Arabic_tweets_negative_20190413.zip',
             'neg')
-    do_work('Arabic_tweets_positive_20190412.zip',
+    do_work('Arabic_tweets_positive_20190413.zip',
             'pos')
     print('all done')
