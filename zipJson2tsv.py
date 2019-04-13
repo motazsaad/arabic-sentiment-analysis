@@ -18,6 +18,7 @@ def clean(text):
     text = remove_repeating_char(text)
     text = tweet_processor.clean(text)
     text = text.replace('\n', ' ')
+    text = text.replace('\t', ' ')
     return text
 
 
@@ -42,6 +43,8 @@ def do_work(zip_file, label):
                         text = json_tweet['text']
                     clean_tweet = clean(text)
                     if has_spam(clean_tweet):
+                        continue
+                    if len(clean_tweet.split()) < 3:
                         continue
                     outfile.write('{}\t{}\n'.format(label, clean_tweet))
                     count += 1

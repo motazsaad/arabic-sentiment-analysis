@@ -50,7 +50,7 @@ def do_sa(n, classifier):
     print('------------------------------------')
 
     print('------------------------------------')
-    print('train data info')
+    print('test data info')
     test_data = pos_test_data + neg_test_data
     print('test data size', len(train_data))
     print('# of positive', len(pos_test_data))
