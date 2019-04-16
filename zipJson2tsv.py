@@ -53,8 +53,6 @@ def do_work(zip_file, label):
 
 
 if __name__ == '__main__':
-    do_work('Arabic_tweets_negative_20190413.zip',
-            'neg')
-    do_work('Arabic_tweets_positive_20190413.zip',
+    do_work('Arabic_tweets_positive_geolocation_Sham_20190415.zip',
             'pos')
     print('all done')
