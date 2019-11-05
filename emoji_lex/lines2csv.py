@@ -18,7 +18,11 @@ neg_emojis = load_emoj_lex(neg_emoji_file)
 def lines2csv_lex(emo_set, emo_file):
     with open(emo_file, encoding='utf-8', mode='w') as file_writer:
         for emo in emo_set:
-            file_writer.write(emo + ',')
+            if emo.strip():
+                if emo.strip() != emo_set[-1]:
+                    file_writer.write(emo + ', ')
+                else:
+                    file_writer.write(emo)
 
 
 lines2csv_lex(pos_emojis, pos_emoji_file.replace('.txt', '.csv'))
