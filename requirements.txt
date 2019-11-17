@@ -1,4 +1,6 @@
+emoji
 tweet-preprocessor
 numpy
 nltk
 sklearn
+regex

@@ -7,6 +7,7 @@ Created on Thu Oct 17 16:39:14 2019
 """
 
 import emoji
+# This regex implementation is backwards-compatible with the standard ‘re’ module, but offers additional functionality.
 import regex
 
 
