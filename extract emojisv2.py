@@ -25,9 +25,10 @@ def read_tsv(data_file):
     return text_data, labels
 
 
-def split_count(text):
+def extract_emo_from_text(text):
     emoji_list = []
     tokens = regex.findall(r'\X', text)
+    # print(tokens)
     for word in tokens:
         if any(char in emoji.UNICODE_EMOJI for char in word):
             emoji_list.append(word)
@@ -37,7 +38,7 @@ def split_count(text):
 def extract_emojis(tweets):
     emo = list()
     for tweet in tweets:
-        tweet_emos = split_count(tweet)
+        tweet_emos = extract_emo_from_text(tweet)
         emo += tweet_emos
     return emo
 
