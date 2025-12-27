@@ -65,3 +65,4 @@ https://mksaad.wordpress.com/2018/12/07/sentiment-analysis-in-arabic-tweets-with
     ISBN = "979-10-95546-51-1"
 }
 ```
+https://www.kaggle.com/datasets/mksaad/arabic-sentiment-twitter-corpus
